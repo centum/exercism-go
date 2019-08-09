@@ -11,7 +11,7 @@ const (
 
 // Score returns points
 func Score(x, y float64) int {
-	r := math.Sqrt(math.Pow(x, 2) + math.Pow(y, 2))
+	r := math.Hypot(x, y)
 	if r <= innerCircle {
 		return 10
 	} else if r <= middleCircle {
