@@ -49,19 +49,14 @@ func FromCodon(input string) (string, error) {
 func FromRNA(input string) ([]string, error) {
 	maxLen := len(input)
 	res := make([]string, 0, maxLen/3)
-	i := 0
-	for {
-		if i+3 <= maxLen {
-			if codon, err := FromCodon(input[i : i+3]); err == nil {
-				res = append(res, codon)
-			} else if err == ErrStop {
-				return res, nil
-			} else {
-				return res, err
-			}
-		} else {
+	for i := 0; i <= maxLen-3; i += 3 {
+		if codon, err := FromCodon(input[i : i+3]); err == nil {
+			res = append(res, codon)
+		} else if err == ErrStop {
 			return res, nil
+		} else {
+			return res, err
 		}
-		i += 3
 	}
+	return res, nil
 }
