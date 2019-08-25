@@ -5,8 +5,10 @@ import (
 	"unicode"
 )
 
+// Frequency is map string to int
 type Frequency map[string]int
 
+// WordCount return frequency map words
 func WordCount(input string) Frequency {
 	result := make(Frequency)
 
