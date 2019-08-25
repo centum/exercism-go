@@ -4,6 +4,7 @@ package encode
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -46,9 +47,7 @@ func RunLengthDecode(input string) string {
 				n, _ = strconv.Atoi(countStr)
 				countStr = ""
 			}
-			for i :=0; i < n; i++ {
-				result += s
-			}
+			result += strings.Repeat(s, n)
 		}
 	}
 	return result
