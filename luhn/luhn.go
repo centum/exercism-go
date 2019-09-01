@@ -1,4 +1,4 @@
-// Package implement validatation by luhn algorithm
+// Package luhn implement validatation by luhn algorithm
 package luhn
 
 import (
@@ -8,9 +8,9 @@ import (
 
 // Valid return true if checksum correct luhn algorithm
 func Valid(inputCode string) bool {
-	sumEven := 0  // Sum if even digits
+	sumEven := 0 // Sum if even digits
 	sumOdd := 0  // Sum if odd digits
-	count := 0  // Count digits
+	count := 0   // Count digits
 
 	for _, r := range inputCode {
 		if unicode.IsDigit(r) {
@@ -27,18 +27,21 @@ func Valid(inputCode string) bool {
 			if count%2 == 0 {
 				sumEven += d
 				sumOdd += v
-			} else {
-				sumEven += v
-				sumOdd += d
+				count++
+				continue
 			}
-			count += 1
 
-		} else if unicode.IsSpace(r) {
+			sumEven += v
+			sumOdd += d
+			count++
 			continue
 
-		} else {
+		}
+
+		if !unicode.IsSpace(r) {
 			return false
 		}
+
 	}
 
 	if count <= 1 {
@@ -48,5 +51,6 @@ func Valid(inputCode string) bool {
 	if count%2 == 0 {
 		return sumEven%10 == 0
 	}
+	
 	return sumOdd%10 == 0
 }
