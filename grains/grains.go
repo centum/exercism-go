@@ -11,13 +11,16 @@ func Square(n int) (uint64, error) {
 
 	var k uint64 = 1
 
-	// for i := 2; i <= n; i++ {  // Iterate result
+	// 1. First implemantion by iterate result
+	// for i := 2; i <= n; i++ {
 	// 	k *= 2
 	// }
 
-	// k = pow(2, n-1) // Geometric progression with the common ratio 2
+	// 2. Optimization as geometric progression with the common ratio 2
+	// k = pow(2, n-1)
 
-	k <<= uint(n - 1) // binary exponentiation
+	// 3. Optimization use left shift operator only
+	k <<= uint(n - 1)
 
 	return k, nil
 }
