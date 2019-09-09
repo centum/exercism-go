@@ -27,12 +27,11 @@ func Square(n int) (uint64, error) {
 
 // Total return the total number of grains
 func Total() uint64 {
-	var r uint64
-	for i := 1; i <= 64; i++ {
-		k, _ := Square(i)
-		r += k
+	var k, i uint64
+	for i = 0; i < 64; i++ {
+		k |= (1 << i)
 	}
-	return r
+	return k
 }
 
 // pow returns x**n, the base-x exponential of n.
