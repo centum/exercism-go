@@ -8,27 +8,16 @@ import (
 // Clock type define clock
 type Clock int
 
+const dayMinutes = 24 * 60
+
 // New return created struct Clock
 func New(h, m int) Clock {
-	if m <= -60 || m >= 60 {
-		hh := m / 60
-		h += hh
-		m -= hh * 60
-	}
-
-	if h <= -24 || h >= 24 {
-		h -= h / 24 * 24
-	}
+	m = (h*60 + m) % dayMinutes
 
 	if m < 0 {
-		h -= 1
-		m += 60
+		m += dayMinutes
 	}
-
-	if h < 0 {
-		h += 24
-	}
-	c := Clock(h*60 + m)
+	c := Clock(m)
 	return c
 }
 
