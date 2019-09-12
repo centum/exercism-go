@@ -34,14 +34,14 @@ var tests = []struct {
 		"ZOMG! ZOMBIES!!!",
 		"zzi ooe mms gb ",
 	},
-	//{
-	//	"Time is an illusion. Lunchtime doubly so.",
-	//	"tasney inicds miohoo elntu  illib  suuml ",
-	//},
-	//{
-	//	"We all know interspecies romance is weird.",
-	//	"wneiaw eorene awssci liprer lneoid ktcms ",
-	//},
+	{
+		"Time is an illusion. Lunchtime doubly so.",
+		"tasney inicds miohoo elntu  illib  suuml ",
+	},
+	{
+		"We all know interspecies romance is weird.",
+		"wneiaw eorene awssci liprer lneoid ktcms ",
+	},
 	{
 		"Madness, and then illumination.",
 		"msemo aanin dnin  ndla  etlt  shui ",
