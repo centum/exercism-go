@@ -7,16 +7,12 @@ func ConcurrentFrequency(listText []string) FreqMap {
 
 	for _, s := range listText {
 		go func(s string) {
-			m := FreqMap{}
-			for _, r := range s {
-				m[r]++
-			}
-			ch <- m
+			ch <- Frequency(s)
 		}(s)
 	}
 
 	m := FreqMap{}
-	for i := len(listText); i > 0; i-- {
+	for range listText {
 		for k, v := range <-ch {
 			m[k] += v
 		}
