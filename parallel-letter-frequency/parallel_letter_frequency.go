@@ -1,25 +1,26 @@
 // Package letter implement function ConcurrentFrequency
 package letter
 
-import "sync"
-
 // ConcurrentFrequency return count the frequency of letters in texts
 func ConcurrentFrequency(listText []string) FreqMap {
-	m := FreqMap{}
-	mu := &sync.Mutex{}
-	wg := &sync.WaitGroup{}
+	ch := make(chan FreqMap, 10)
 
 	for _, s := range listText {
-		wg.Add(1)
 		go func(s string) {
-			defer wg.Done()
+			m := FreqMap{}
 			for _, r := range s {
-				mu.Lock()
 				m[r]++
-				mu.Unlock()
 			}
+			ch <- m
 		}(s)
 	}
-	wg.Wait()
+
+	m := FreqMap{}
+	for i := len(listText); i > 0; i-- {
+		for k, v := range <-ch {
+			m[k] += v
+		}
+	}
+
 	return m
 }
