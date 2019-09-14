@@ -14,57 +14,61 @@ type Node struct {
 	Children []*Node
 }
 
-var (
-	ErrNonContinuous = errors.New("non-continuous")
-	ErrDuplicateNode = errors.New("duplicate node")
-	ErrWrongParent   = errors.New("wrong parent")
-	ErrCycleDirectly = errors.New("cycle directly")
-	ErrNoRoot        = errors.New("no root node")
-)
-
-func (n *Node) findChildren(records *[]Record, pos int) error {
-	for i, r := range *records {
-		pos++
-		if r.ID != pos {
-			return ErrNonContinuous
-		}
-		if r.ID == n.ID {
-			return ErrDuplicateNode
-		}
-		if r.Parent > r.ID {
-			return ErrWrongParent
-		}
-		if r.Parent == r.ID {
-			return ErrCycleDirectly
-		}
-		if r.Parent == n.ID {
-			child := &Node{ID: r.ID}
-			n.Children = append(n.Children, child)
-			recs := (*records)[i+1:]
-			if err := child.findChildren(&recs, pos); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+func (n *Node) AppendChild(child *Node) {
+	i := sort.Search(len(n.Children), func(i int) bool { return n.Children[i].ID > child.ID })
+	n.Children = append(n.Children, &Node{})
+	copy(n.Children[i+1:], n.Children[i:])
+	n.Children[i] = child
 }
+
+var (
+	ErrNonContinuous   = errors.New("non-continuous")
+	ErrWrongParent     = errors.New("wrong parent")
+	ErrCycleDependency = errors.New("cycle dependency")
+	ErrNoRoot          = errors.New("no root node")
+)
 
 func Build(records []Record) (*Node, error) {
 	if len(records) == 0 {
 		return nil, nil
 	}
 
-	sort.SliceStable(records, func(i, j int) bool { return records[i].ID < records[j].ID })
+	mapNodes := make(map[int]*Node, len(records))
+	maxID := 0
+	for _, r := range records {
+		if _, ok := mapNodes[r.ID]; !ok {
+			mapNodes[r.ID] = &Node{ID: r.ID}
+		}
 
-	if records[0].ID != 0 || records[0].Parent != 0 {
+		if r.ID == 0 {
+			if r.Parent == 0 {
+				continue
+			}
+			return nil, ErrWrongParent
+		}
+
+		if r.Parent >= r.ID {
+			return nil, ErrCycleDependency
+		}
+
+		if _, ok := mapNodes[r.Parent]; !ok {
+			mapNodes[r.Parent] = &Node{ID: r.Parent}
+		}
+
+		mapNodes[r.Parent].AppendChild(mapNodes[r.ID])
+
+		if r.ID > maxID {
+			maxID = r.ID
+		}
+	}
+	if len(records) != maxID+1 {
+		return nil, ErrNonContinuous
+	}
+
+	node, ok := mapNodes[0]
+	if !ok {
 		return nil, ErrNoRoot
 	}
 
-	records = records[1:]
-
-	node := &Node{}
-
-	err := node.findChildren(&records, 0)
-
-	return node, err
+	return node, nil
 }
