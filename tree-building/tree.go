@@ -14,27 +14,34 @@ type Node struct {
 	Children []*Node
 }
 
-func (n *Node) findChildren(records []Record) error {
-	for _, r := range records {
+var (
+	ErrNonContinuous = errors.New("non-continuous")
+	ErrDuplicateNode = errors.New("duplicate node")
+	ErrWrongParent   = errors.New("wrong parent")
+	ErrCycleDirectly = errors.New("cycle directly")
+	ErrNoRoot        = errors.New("no root node")
+)
+
+func (n *Node) findChildren(records *[]Record, pos int) error {
+	for i, r := range *records {
+		pos++
+		if r.ID != pos {
+			return ErrNonContinuous
+		}
 		if r.ID == n.ID {
-			continue
+			return ErrDuplicateNode
 		}
 		if r.Parent > r.ID {
-			return errors.New("wrong parent")
+			return ErrWrongParent
 		}
 		if r.Parent == r.ID {
-			return errors.New("cycle directly")
+			return ErrCycleDirectly
 		}
 		if r.Parent == n.ID {
-			if n.Children == nil {
-				n.Children = make([]*Node, 0)
-			}
-			if len(n.Children) > 0 && n.Children[len(n.Children)-1].ID == r.ID {
-				return errors.New("duplicate node")
-			}
 			child := &Node{ID: r.ID}
 			n.Children = append(n.Children, child)
-			if err := child.findChildren(records); err != nil {
+			recs := (*records)[i+1:]
+			if err := child.findChildren(&recs, pos); err != nil {
 				return err
 			}
 		}
@@ -46,27 +53,18 @@ func Build(records []Record) (*Node, error) {
 	if len(records) == 0 {
 		return nil, nil
 	}
+
 	sort.SliceStable(records, func(i, j int) bool { return records[i].ID < records[j].ID })
 
 	if records[0].ID != 0 || records[0].Parent != 0 {
-		return nil, errors.New("no root node")
+		return nil, ErrNoRoot
 	}
 
-	node := &Node{}
 	records = records[1:]
 
-	prevID := 0
-	for i, r := range records {
-		if r.ID == prevID {
-			return nil, errors.New("duplicate node")
-		}
-		if r.ID != i+1 {
-			return nil, errors.New("non-continuous")
-		}
-		prevID = r.ID
-	}
+	node := &Node{}
 
-	err := node.findChildren(records)
+	err := node.findChildren(&records, 0)
 
 	return node, err
 }
