@@ -6,10 +6,12 @@ import (
 	"sort"
 )
 
+// Record represents input dataset
 type Record struct {
 	ID, Parent int
 }
 
+// Node represents node of tree
 type Node struct {
 	ID       int
 	Children []*Node
@@ -24,10 +26,14 @@ func (n *Node) AppendChild(child *Node) {
 }
 
 var (
-	ErrNonContinuous   = errors.New("non-continuous")
-	ErrWrongParent     = errors.New("wrong parent")
+	// ErrNonContinuous error broken sequence
+	ErrNonContinuous = errors.New("non-continuous")
+	// ErrWrongParent error wrong parent
+	ErrWrongParent = errors.New("wrong parent")
+	// ErrCycleDependency error detected cycle dependency
 	ErrCycleDependency = errors.New("cycle dependency")
-	ErrNoRoot          = errors.New("no root node")
+	// ErrNoRoot error raised if not fount root node
+	ErrNoRoot = errors.New("no root node")
 )
 
 // Build build Node struct from list Record
