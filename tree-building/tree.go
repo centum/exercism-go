@@ -39,7 +39,6 @@ func Build(records []Record) (*Node, error) {
 	})
 
 	mapNodes := make(map[int]*Node, len(records))
-	maxID := 0 // needed to detect non-continuous
 	for _, r := range records {
 		if _, ok := mapNodes[r.ID]; !ok {
 			mapNodes[r.ID] = &Node{ID: r.ID}
@@ -61,12 +60,9 @@ func Build(records []Record) (*Node, error) {
 		}
 
 		mapNodes[r.Parent].Children = append(mapNodes[r.Parent].Children, mapNodes[r.ID])
-
-		if r.ID > maxID {
-			maxID = r.ID
-		}
 	}
-	if len(records) != maxID+1 {
+
+	if i := len(records) - 1; i != records[i].ID {
 		return nil, ErrNonContinuous
 	}
 
