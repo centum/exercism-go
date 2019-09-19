@@ -36,14 +36,10 @@ func (c SimpleCipher) convert(in string, enc bool) string {
 }
 
 func (c SimpleCipher) getDistance(enc bool, pos int) int32 {
-	if c.distance != 0 {
-		if enc {
-			return int32(c.distance)
-		}
-		return -int32(c.distance)
+	d := int32(c.distance)
+	if c.distance == 0 {
+		d = rune(c.key[pos%len(c.key)]) - minChar
 	}
-	pos = pos % len(c.key)
-	d := rune(c.key[pos]) - minChar
 	if enc {
 		return d
 	}
