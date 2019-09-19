@@ -5,8 +5,7 @@ import (
 )
 
 type SimpleCipher struct {
-	distance int
-	key      string
+	key string
 }
 
 const (
@@ -22,28 +21,22 @@ func (c SimpleCipher) convert(in string, enc bool) string {
 	pos := 0
 	for _, r := range in {
 		if r >= minChar && r <= maxChar {
-			n := r + c.getDistance(enc, pos)
-			if n > maxChar {
-				n += diffRight
-			} else if n < minChar {
-				n += diffLeft
+			d := rune(c.key[pos%len(c.key)]) - minChar
+			if enc {
+				r += d
+			} else {
+				r -= d
 			}
-			res = append(res, n)
+			if r > maxChar {
+				r += diffRight
+			} else if r < minChar {
+				r += diffLeft
+			}
+			res = append(res, r)
 			pos++
 		}
 	}
 	return string(res)
-}
-
-func (c SimpleCipher) getDistance(enc bool, pos int) int32 {
-	d := int32(c.distance)
-	if c.distance == 0 {
-		d = rune(c.key[pos%len(c.key)]) - minChar
-	}
-	if enc {
-		return d
-	}
-	return -d
 }
 
 func (c SimpleCipher) Encode(in string) string {
@@ -55,14 +48,20 @@ func (c SimpleCipher) Decode(in string) string {
 }
 
 func NewCaesar() Cipher {
-	return SimpleCipher{distance: 3}
+	return NewVigenere(string('a' + 3))
 }
 
 func NewShift(distance int) Cipher {
 	if distance >= 26 || distance <= -26 || distance == 0 {
 		return nil
 	}
-	return SimpleCipher{distance: distance}
+	n := 'a' + distance
+	if n > maxChar {
+		n += diffRight
+	} else if n < minChar {
+		n += diffLeft
+	}
+	return NewVigenere(string(n))
 }
 
 func NewVigenere(key string) Cipher {
