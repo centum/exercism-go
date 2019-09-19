@@ -8,20 +8,19 @@ func Nth(n int) (int, bool) {
 		return 2, true
 	}
 
-	res := 1
-	k := 1
+	prime := 1
 
 LOOP0:
 	for {
-		res += 2
-		for i := res - 1; i >= 2; i-- {
-			if res%i == 0 {
+		prime += 2
+		for i := 3; i < prime; i += 2 {
+			if prime%i == 0 {
 				continue LOOP0
 			}
 		}
-		k++
-		if k == n {
-			return res, true
+
+		if n--; n == 1 {
+			return prime, true
 		}
 	}
 }
